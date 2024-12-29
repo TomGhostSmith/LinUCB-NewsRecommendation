@@ -15,6 +15,7 @@ class Evaluator():
     @classmethod
     def drawImage(clz, evaluators, imageName):
         plt.figure(figsize=(20, 12))
+        # plt.figure(figsize=(20, 25))
         evaluatorList = [(evaluator, evaluator.realRewards[-1]) for evaluator in evaluators]
         evaluatorList = sorted(evaluatorList, key=lambda a: a[1], reverse=True)
         for evaluator, score in evaluatorList:
@@ -26,6 +27,7 @@ class Evaluator():
         plt.close()
 
         plt.figure(figsize=(20, 12))
+        # plt.figure(figsize=(20, 25))
         evaluatorList = [(evaluator, evaluator.recordedRegrets[-1]) for evaluator in evaluators]
         evaluatorList = sorted(evaluatorList, key=lambda a: a[1])
         for evaluator, score in evaluatorList:

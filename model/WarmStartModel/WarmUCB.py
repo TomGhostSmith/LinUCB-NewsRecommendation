@@ -22,10 +22,10 @@ class WarmUCB(MAB):
         self.warmModel = None
 
         warmthDimension = {
-            "user": config.userContextDimension,
-            "article": config.articleContextDimension,
-            "user+article": config.armContextDimension,
-            "user*article": config.userContextDimension * config.articleContextDimension
+            "user": config.userContextDimension + 1,
+            "article": config.articleContextDimension + 1,
+            "user+article": config.armContextDimension + 1,
+            "user*article": (config.userContextDimension + 1) * (config.articleContextDimension + 1)
         }
         self.warmthDimention = warmthDimension[self.warmType]
 
@@ -54,7 +54,7 @@ class WarmUCB(MAB):
             userFeature = self.preprocessContext(feature[config.userContextIndex])
             articleFeature = self.preprocessContext(feature[config.articelContextIndex])
             feature = numpy.outer(userFeature, articleFeature)
-            feature.resize(config.userContextDimension * config.articleContextDimension)
+            feature.resize((config.userContextDimension + 1) * (config.articleContextDimension + 1))
         return feature
 
 
@@ -72,8 +72,9 @@ class WarmUCB(MAB):
                 feature = (feature - min(feature)) / (max(feature) - min(feature))
             else:
                 feature = numpy.zeros_like(feature)
-        
-        return feature
+        feature = feature.tolist()
+        feature.append(1)
+        return numpy.array(feature)
 
         
 
