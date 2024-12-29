@@ -20,21 +20,21 @@ class WarmLinUCBHybrid(MAB):
         # k: user/article combination
         # d: article dimension
 
-        self.A0 = numpy.identity(config.userContextDimension)
-        self.b0 = numpy.zeros(config.userContextDimension)
+        self.A0 = numpy.identity(config.userContextDimension + 1)
+        self.b0 = numpy.zeros(config.userContextDimension + 1)
 
 
-        self.A = numpy.array([numpy.identity(config.articleContextDimension)] * config.armCount)
-        self.B = numpy.zeros((config.armCount, config.articleContextDimension, config.userContextDimension))
-        self.b = numpy.zeros((config.armCount, config.articleContextDimension))
+        self.A = numpy.array([numpy.identity(config.articleContextDimension + 1)] * config.armCount)
+        self.B = numpy.zeros((config.armCount, config.articleContextDimension + 1, config.userContextDimension + 1))
+        self.b = numpy.zeros((config.armCount, config.articleContextDimension + 1))
 
         self.warmModel = None
 
         warmthDimension = {
-            "user": config.userContextDimension,
-            "article": config.articleContextDimension,
-            "user+article": config.armContextDimension,
-            "user*article": config.userContextDimension * config.articleContextDimension
+            "user": config.userContextDimension + 1,
+            "article": config.articleContextDimension + 1,
+            "user+article": config.armContextDimension + 1,
+            "user*article": (config.userContextDimension + 1) * (config.articleContextDimension + 1)
         }
         self.warmthDimention = warmthDimension[self.warmType]
 
@@ -64,7 +64,7 @@ class WarmLinUCBHybrid(MAB):
             userFeature = self.preprocessContext(feature[config.userContextIndex])
             articleFeature = self.preprocessContext(feature[config.articelContextIndex])
             feature = numpy.outer(userFeature, articleFeature)
-            feature.resize(config.userContextDimension * config.articleContextDimension)
+            feature.resize((config.userContextDimension + 1) * (config.articleContextDimension + 1))
         return feature
 
     def preprocessContext(self, feature):
@@ -81,8 +81,9 @@ class WarmLinUCBHybrid(MAB):
                 feature = (feature - min(feature)) / (max(feature) - min(feature))
             else:
                 feature = numpy.zeros_like(feature)
-        
-        return feature
+        feature = feature.tolist()
+        feature.append(1)
+        return numpy.array(feature)
 
 
     def selectArm(self, context=None):
@@ -95,9 +96,9 @@ class WarmLinUCBHybrid(MAB):
             userFeature = self.preprocessContext(context[i, config.userContextIndex])
 
             x = articleFeature
-            x.resize((config.articleContextDimension, 1))
+            x.resize((config.articleContextDimension + 1, 1))
             z = userFeature
-            z.resize((config.userContextDimension, 1))
+            z.resize((config.userContextDimension + 1, 1))
             invA = numpy.linalg.inv(self.A[i])
             B = self.B[i]
             b = self.b[i]
@@ -124,9 +125,9 @@ class WarmLinUCBHybrid(MAB):
         userFeature = self.preprocessContext(record.context[arm, config.userContextIndex])
 
         x = articleFeature
-        x.resize((config.articleContextDimension, 1))
+        x.resize((config.articleContextDimension + 1, 1))
         z = userFeature
-        z.resize((config.userContextDimension, 1))
+        z.resize((config.userContextDimension + 1, 1))
         invA = numpy.linalg.inv(self.A[arm])
         B = self.B[arm]
         b = self.b[arm]

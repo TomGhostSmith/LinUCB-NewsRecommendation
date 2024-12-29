@@ -18,13 +18,13 @@ class LinUCBHybrid(MAB):
         # k: user/article combination
         # d: article dimension
 
-        self.A0 = numpy.identity(config.userContextDimension)
-        self.b0 = numpy.zeros(config.userContextDimension)
+        self.A0 = numpy.identity(config.userContextDimension + 1)
+        self.b0 = numpy.zeros(config.userContextDimension + 1)
 
 
-        self.A = numpy.array([numpy.identity(config.articleContextDimension)] * config.armCount)
-        self.B = numpy.zeros((config.armCount, config.articleContextDimension, config.userContextDimension))
-        self.b = numpy.zeros((config.armCount, config.articleContextDimension))
+        self.A = numpy.array([numpy.identity(config.articleContextDimension + 1)] * config.armCount)
+        self.B = numpy.zeros((config.armCount, config.articleContextDimension + 1, config.userContextDimension + 1))
+        self.b = numpy.zeros((config.armCount, config.articleContextDimension + 1))
 
 
         self.name = r"LinUCB Hybrid ($\alpha$={:.2f}, method={})".format(self.alpha, self.method)
@@ -46,8 +46,9 @@ class LinUCBHybrid(MAB):
                 feature = (feature - min(feature)) / (max(feature) - min(feature))
             else:
                 feature = numpy.zeros_like(feature)
-        
-        return feature
+        feature = feature.tolist()
+        feature.append(1)
+        return numpy.array(feature)
 
 
     def selectArm(self, context=None):
@@ -60,9 +61,9 @@ class LinUCBHybrid(MAB):
             userFeature = self.preprocessContext(context[i, config.userContextIndex])
 
             x = articleFeature
-            x.resize((config.articleContextDimension, 1))
+            x.resize((config.articleContextDimension + 1, 1))
             z = userFeature
-            z.resize((config.userContextDimension, 1))
+            z.resize((config.userContextDimension + 1, 1))
             invA = numpy.linalg.inv(self.A[i])
             B = self.B[i]
             b = self.b[i]
@@ -87,9 +88,9 @@ class LinUCBHybrid(MAB):
         userFeature = self.preprocessContext(record.context[arm, config.userContextIndex])
 
         x = articleFeature
-        x.resize((config.articleContextDimension, 1))
+        x.resize((config.articleContextDimension + 1, 1))
         z = userFeature
-        z.resize((config.userContextDimension, 1))
+        z.resize((config.userContextDimension + 1, 1))
         invA = numpy.linalg.inv(self.A[arm])
         B = self.B[arm]
         b = self.b[arm]

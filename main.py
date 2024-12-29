@@ -7,9 +7,11 @@ from model.BasicModel.ThompsonSampling import ThompsonSampling
 from model.ContextModel.LinUCBDisjoint import LinUCBDisjoint
 from model.ContextModel.LinUCBHybrid import LinUCBHybrid
 from model.ContextModel.LinUCBHybridExt import LinUCBHybridExt
+from model.ContextModel.LinUCBHybridExtUser import LinUCBHybridExtUser
 
 from model.WarmStartModel.WarmUCB import WarmUCB
 from model.WarmStartModel.WarmEpsilonGreedy import WarmEpsilonGreedy
+from model.WarmStartModel.WarmLinUCBDisjoint import WarmLinUCBDisjoint
 from model.WarmStartModel.WarmLinUCBHybrid import WarmLinUCBHybrid
 
 from model.evaluator import Evaluator
@@ -44,10 +46,14 @@ def main():
     models.append(UCB({"alpha": 0}))
     models.append(UCB({"alpha": 0.05}))
     models.append(UCB({"alpha": 0.1}))
+    # models.append(UCB({"alpha": 0.2}))
+    # models.append(UCB({"alpha": 0.3}))
+    # models.append(UCB({"alpha": 0.4}))
+    # models.append(UCB({"alpha": 0.5}))
     # models.append(WarmUCB({"alpha": 0.05, "warmType": "user", "method": "normalize"}))
-    # models.append(WarmUCB({"alpha": 0.05, "warmType": "article", "method": "normalize"}))
+    models.append(WarmUCB({"alpha": 0.05, "warmType": "article", "method": "normalize"}))
     # models.append(WarmUCB({"alpha": 0.05, "warmType": "user*article", "method": "normalize"}))
-    # models.append(WarmUCB({"alpha": 0.05, "warmType": "user+article", "method": "normalize"}))
+    models.append(WarmUCB({"alpha": 0.05, "warmType": "user+article", "method": "normalize"}))
     # models.append(WarmUCB({"alpha": 0.05, "warmType": "user+article", "method": "standarize"}))
     # models.append(WarmUCB({"alpha": 0.05, "warmType": "user+article", "method": "one"}))
     models.append(RandomModel({}))
@@ -61,18 +67,45 @@ def main():
     # models.append(LinUCBDisjoint({"alpha": 0.05, "useUser": False, "method": "standarize"}))
     # models.append(LinUCBDisjoint({"alpha": 0.05, "useUser": False, "method": "one"}))
     # models.append(LinUCBDisjoint({"alpha": 0.1, "useUser": False, "method": "normalize"}))
-    models.append(LinUCBDisjoint({"alpha": 0.2, "useUser": False, "method": "normalize"}))
-    models.append(LinUCBDisjoint({"alpha": 0.2, "useUser": True, "method": "normalize"}))
+    # models.append(LinUCBDisjoint({"alpha": 0.2, "useUser": False, "method": "normalize"}))
+    # models.append(LinUCBDisjoint({"alpha": 0.2, "useUser": True, "method": "normalize"}))
+    # models.append(LinUCBDisjoint({"alpha": 0.3, "useUser": True, "method": "normalize"}))
+    models.append(LinUCBDisjoint({"alpha": 0.4, "useUser": True, "method": "normalize"}))
+    # models.append(LinUCBDisjoint({"alpha": 0.4, "useUser": False, "method": "normalize"}))
+    # models.append(LinUCBDisjoint({"alpha": 0.4, "useUser": True, "method": "standarize"}))
+    # models.append(LinUCBDisjoint({"alpha": 0.4, "useUser": True, "method": "one"}))
+    # models.append(LinUCBDisjoint({"alpha": 0.5, "useUser": True, "method": "normalize"}))
+    # models.append(LinUCBDisjoint({"alpha": 0.5, "useUser": True, "method": "standarize"}))
+    # models.append(LinUCBDisjoint({"alpha": 0.5, "useUser": True, "method": "one"}))
+    # models.append(LinUCBDisjoint({"alpha": 0.5, "useUser": True, "method": "normalize"}))
+    # models.append(WarmLinUCBDisjoint({"alpha": 0.2, "useUser": True, "method": "normalize"}))
+    # models.append(WarmLinUCBDisjoint({"alpha": 0.3, "useUser": True, "method": "normalize"}))
+    # models.append(WarmLinUCBDisjoint({"alpha": 0.4, "useUser": True, "method": "normalize"}))
+    # models.append(WarmLinUCBDisjoint({"alpha": 0.5, "useUser": True, "method": "normalize"}))
     # models.append(LinUCBHybrid({"alpha": 0.05, "method": "normalize"}))
-    models.append(LinUCBHybrid({"alpha": 0.2, "method": "normalize"}))
+    # models.append(LinUCBHybrid({"alpha": 0.2, "method": "normalize"}))
+    models.append(LinUCBHybrid({"alpha": 0.3, "method": "normalize"}))
+    models.append(LinUCBHybrid({"alpha": 0.4, "method": "normalize"}))
+    models.append(LinUCBHybrid({"alpha": 0.5, "method": "normalize"}))
     # models.append(WarmLinUCBHybrid({"alpha": 0.05, "warmType": "article", "method": "normalize"}))
     # models.append(WarmLinUCBHybrid({"alpha": 0.05, "warmType": "user", "method": "normalize"}))
     # models.append(WarmLinUCBHybrid({"alpha": 0.05, "warmType": "user+article", "method": "normalize"}))
     # models.append(WarmLinUCBHybrid({"alpha": 0.05, "warmType": "user*article", "method": "normalize"}))
+    # models.append(WarmLinUCBHybrid({"alpha": 0.2, "warmType": "user+article", "method": "normalize"}))
+    # models.append(WarmLinUCBHybrid({"alpha": 0.3, "warmType": "user+article", "method": "normalize"}))
+    # models.append(WarmLinUCBHybrid({"alpha": 0.4, "warmType": "user+article", "method": "normalize"}))
+    # models.append(WarmLinUCBHybrid({"alpha": 0.5, "warmType": "user+article", "method": "normalize"}))
     # models.append(LinUCBHybridExt({"alpha": 0.05, "method": "normalize"}))
-    models.append(LinUCBHybridExt({"alpha": 0.2, "method": "normalize"}))
+    # models.append(LinUCBHybridExt({"alpha": 0.2, "method": "normalize"}))
+    models.append(LinUCBHybridExt({"alpha": 0.3, "method": "normalize"}))
+    models.append(LinUCBHybridExt({"alpha": 0.4, "method": "normalize"}))
+    models.append(LinUCBHybridExt({"alpha": 0.5, "method": "normalize"}))
+    # models.append(LinUCBHybridExtUser({"alpha": 0.2, "method": "normalize"}))
+    models.append(LinUCBHybridExtUser({"alpha": 0.3, "method": "normalize"}))
+    models.append(LinUCBHybridExtUser({"alpha": 0.4, "method": "normalize"}))
+    models.append(LinUCBHybridExtUser({"alpha": 0.5, "method": "normalize"}))
     dataset = Dataset.fromFile("dataset/dataset.txt")
-    compareModels(models, dataset, "test")
+    compareModels(models, dataset, "LinUCBHybridExt2")
 
 
 if (__name__ == '__main__'):

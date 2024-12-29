@@ -4,7 +4,7 @@ from model.MAB import MAB
 from model.dataset import Dataset
 from model.record import Record
 from config import config
-class LinUCBHybridExt(MAB):
+class LinUCBHybridExtUser(MAB):
     def __init__(self, args) -> None:
         random.seed(config.seed)
         numpy.random.seed(config.seed)
@@ -24,12 +24,12 @@ class LinUCBHybridExt(MAB):
         self.b0 = numpy.zeros(self.userContextDimension)
 
 
-        self.A = numpy.array([numpy.identity(config.articleContextDimension + 1)] * config.armCount)
-        self.B = numpy.zeros((config.armCount, config.articleContextDimension + 1, self.userContextDimension))
-        self.b = numpy.zeros((config.armCount, config.articleContextDimension + 1))
+        self.A = numpy.array([numpy.identity(config.userContextDimension + 1)] * config.armCount)
+        self.B = numpy.zeros((config.armCount, config.userContextDimension + 1, self.userContextDimension))
+        self.b = numpy.zeros((config.armCount, config.userContextDimension + 1))
 
 
-        self.name = r"LinUCB Hybrid Ext. ($\alpha$={:.2f})".format(self.alpha)
+        self.name = r"LinUCB Hybrid Ext. User ($\alpha$={:.2f})".format(self.alpha)
 
     def train(self, trainset:Dataset):
         pass
@@ -62,8 +62,8 @@ class LinUCBHybridExt(MAB):
             articleFeature = self.preprocessContext(context[i, config.articelContextIndex])
             userFeature = self.preprocessContext(context[i, config.userContextIndex])
 
-            x = articleFeature
-            x.resize((config.articleContextDimension + 1, 1))
+            x = userFeature
+            x.resize((config.userContextDimension + 1, 1))
             z = numpy.outer(userFeature, articleFeature)
             z.resize((self.userContextDimension, 1))
             invA = numpy.linalg.inv(self.A[i])
@@ -89,8 +89,8 @@ class LinUCBHybridExt(MAB):
         articleFeature = self.preprocessContext(record.context[arm, config.articelContextIndex])
         userFeature = self.preprocessContext(record.context[arm, config.userContextIndex])
 
-        x = articleFeature
-        x.resize((config.articleContextDimension + 1, 1))
+        x = userFeature
+        x.resize((config.userContextDimension + 1, 1))
         z = numpy.outer(userFeature, articleFeature)
         z.resize((self.userContextDimension, 1))
         invA = numpy.linalg.inv(self.A[arm])

@@ -1,10 +1,11 @@
 import numpy
 import random
+import sklearn
 from model.MAB import MAB
 from model.dataset import Dataset
 from model.record import Record
 from config import config
-class LinUCBDisjoint(MAB):
+class WarmLinUCBDisjoint(MAB):
     def __init__(self, args) -> None:
         random.seed(config.seed)
         numpy.random.seed(config.seed)
@@ -21,10 +22,18 @@ class LinUCBDisjoint(MAB):
         self.A = numpy.array([numpy.identity(self.size + 1)] * config.armCount)
         self.b = numpy.zeros((config.armCount, self.size + 1))
 
-        self.name = r"LinUCB Disjoint ($\alpha$={:.2f}, info={}, method={})".format(self.alpha, "Article + User" if self.useUser else "Article only", self.method)
+        self.name = r"Warm LinUCB Disjoint ($\alpha$={:.2f}, info={}, method={})".format(self.alpha, "Article + User" if self.useUser else "Article only", self.method)
 
     def train(self, trainset:Dataset):
-        pass
+        contexts = numpy.zeros((len(trainset.records), self.size + 1))
+        rewards = numpy.zeros(len(trainset.records))
+        for idx, record in trainset.iterRecords():
+            selectedArm = record.arm
+            contexts[idx] = self.preprocessContext(record.context[selectedArm])
+            rewards[idx] = record.reward
+        
+        self.warmModel = sklearn.linear_model.LogisticRegression(solver='lbfgs', max_iter=1000, random_state=42)
+        self.warmModel.fit(contexts, rewards)
 
     def preprocessContext(self, feature):
         feature = feature[self.slice]
@@ -33,7 +42,7 @@ class LinUCBDisjoint(MAB):
                 feature = feature /  numpy.linalg.norm(feature)  # normalize / standarize / min-max normalization
         elif (self.method == 'standarize'):
             if (max(feature) != min(feature)):
-                feature = (feature - numpy.mean(feature)) / numpy.sqrt(numpy.var(feature))
+                feature = (feature - numpy.mean(feature)) / numpy.var(feature)
             else:
                 feature = numpy.zeros_like(feature)
         elif (self.method == 'one'):
@@ -52,7 +61,8 @@ class LinUCBDisjoint(MAB):
         for i in range(config.armCount):
             feature = self.preprocessContext(context[i])
             theta = numpy.linalg.inv(self.A[i]).dot(self.b[i])
-            p[i] = theta.T.dot(feature) + self.alpha * numpy.sqrt(feature.T.dot(numpy.linalg.inv(self.A[i])).dot(feature))
+            warmth = self.warmModel.predict_log_proba([feature])[0][1]
+            p[i] = theta.T.dot(feature) + self.alpha * numpy.sqrt(feature.T.dot(numpy.linalg.inv(self.A[i])).dot(feature)) + warmth
         
         maxReward = max(p)
         maxRewardArms = [idx for idx in range(config.armCount) if p[idx] == maxReward]
